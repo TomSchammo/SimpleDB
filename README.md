@@ -13,7 +13,7 @@ programming language to complete this project for no particular reason, other th
 
 # Roadmap
 
-- [ ] Part 01 - Introduction and Setting up the REPL
+- [x] Part 01 - Introduction and Setting up the REPL
 - [ ] Part 02 - World’s Simplest SQL Compiler and Virtual Machine
 - [ ] Part 03 - An In-Memory, Append-Only, Single-Table Database
 - [ ] Part 04 - Our First Tests (and Bugs)
