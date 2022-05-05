@@ -24,7 +24,7 @@ fn print_prompt() {
     let _ = stdout().flush();
 }
 
-fn match_command(command: &str) {
+fn parse_command(command: &str) {
     match command {
         ".exit" => {
             std::process::exit(EXIT_SUCCESS);
@@ -39,6 +39,6 @@ fn main() {
     loop {
         print_prompt();
         let input = read_input();
-        match_command(&input);
+        parse_command(&input);
     }
 }
