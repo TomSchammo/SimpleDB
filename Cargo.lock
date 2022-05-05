@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "SimpleDB"
+name = "simple_db"
 version = "0.1.0"
