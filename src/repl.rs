@@ -1,7 +1,5 @@
 use std::io::{stdin, stdout, Write};
 
-use crate::sql::Statement;
-
 const EXIT_SUCCESS: i32 = 0;
 
 fn read_input() -> String {
