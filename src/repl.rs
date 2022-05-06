@@ -25,12 +25,19 @@ fn print_prompt() {
 }
 
 fn parse_command(command: &str) {
-    match command {
-        ".exit" => {
-            std::process::exit(EXIT_SUCCESS);
-        }
-        _ => {
-            println!("Unrecognized command: '{command}'.");
+    if !command.is_empty() {
+        match (command.chars().next().expect("Invalid command!"), command) {
+            ('.', ".exit") => {
+                std::process::exit(EXIT_SUCCESS);
+            }
+
+            ('.', _) => {
+                println!("Unrecognized meta-command: '{command}'.");
+            }
+
+            _ => {
+                println!("Unrecognized command: '{command}'.");
+            }
         }
     }
 }
