@@ -1,5 +1,7 @@
 use std::io::{stdin, stdout, Write};
 
+use crate::sql::Statement;
+
 const EXIT_SUCCESS: i32 = 0;
 
 fn read_input() -> String {
@@ -36,7 +38,16 @@ fn parse_command(command: &str) {
             }
 
             _ => {
-                println!("Unrecognized command: '{command}'.");
+                let result = super::sql::prepare_statement(command);
+
+                match result {
+                    Err(crate::sql::ParsingError::UnrecognizedStatement) => {
+                        println!("Unrecognized statement: '{command}'.");
+                    }
+                    Ok(_statement) => {
+                        println!("ok");
+                    }
+                }
             }
         }
     }
