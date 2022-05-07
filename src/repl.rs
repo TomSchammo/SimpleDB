@@ -39,8 +39,19 @@ fn parse_command(command: &str) {
                 let result = super::sql::prepare_statement(command);
 
                 match result {
-                    Err(crate::sql::ParsingError::UnrecognizedStatement) => {
+                    Err(super::sql::ParsingError::UnrecognizedStatement) => {
                         println!("Unrecognized statement: '{command}'.");
+                    }
+                    Err(super::sql::ParsingError::InvalidId) => {
+                        println!("Syntax error in '{command}', expected ID as first argument");
+                    }
+                    Err(super::sql::ParsingError::InvalidUsername) => {
+                        println!(
+                            "Syntax error in '{command}', expected username as second argument"
+                        );
+                    }
+                    Err(super::sql::ParsingError::InvalidEmail) => {
+                        println!("Syntax error in '{command}', expected email as third argument");
                     }
                     Ok(_statement) => {
                         println!("ok");
