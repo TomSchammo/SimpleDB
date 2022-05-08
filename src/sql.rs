@@ -15,7 +15,17 @@ enum StatementType {
 }
 
 pub struct Statement {
+    /// Type of the statement (currently only `select` and `insert` are suppported)
     r#type: StatementType,
+    /// A Row that should be inserted into the taple. Is `None` when the type of the statement is
+    /// `select` and `Some` when it is `insert`.
+    row_to_insert: Option<Row>,
+}
+
+pub struct Row {
+    id: u32,
+    username: String,
+    email: String,
 }
 
 pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
@@ -25,6 +35,7 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
             println!("{:?}", rest);
             Ok(Statement {
                 r#type: StatementType::Select,
+                row_to_insert: None,
             })
         }
         ["insert", id, username, email] => {
@@ -57,6 +68,11 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
 
             Ok(Statement {
                 r#type: StatementType::Insert,
+                row_to_insert: Some(Row {
+                    id: id_result.unwrap(),
+                    username: username.to_string(),
+                    email: email.to_string(),
+                }),
             })
         }
         ["insert", rest @ ..] => {
