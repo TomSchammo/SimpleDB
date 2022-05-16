@@ -24,8 +24,8 @@ pub struct Statement {
 
 pub struct Row {
     id: u32,
-    username: String,
-    email: String,
+    username: [u8; COLUMN_USERNAME_SIZE],
+    email: [u8; COLUMN_EMAIL_SIZE],
 }
 
 pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
@@ -46,9 +46,12 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
                 return Err(ParsingError::InvalidId);
             }
 
-            if username.len() > COLUMN_USERNAME_SIZE {
+            let username_bytes = username.as_bytes();
+            let email_bytes = email.as_bytes();
+
+            if username_bytes.len() > COLUMN_USERNAME_SIZE {
                 println!(
-                    "username cannot be longer than {} characters '{}' has a length of {}",
+                    "username cannot be longer than {} bytes '{}' has a length of {}",
                     COLUMN_USERNAME_SIZE,
                     username,
                     username.len()
@@ -56,9 +59,9 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
                 return Err(ParsingError::InvalidUsername);
             }
 
-            if email.len() > COLUMN_EMAIL_SIZE {
+            if email_bytes.len() > COLUMN_EMAIL_SIZE {
                 println!(
-                    "email cannot be longer than {} characters '{}' has a length of {}",
+                    "email cannot be longer than {} bytes '{}' has a length of {}",
                     COLUMN_EMAIL_SIZE,
                     email,
                     email.len()
@@ -70,8 +73,8 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
                 r#type: StatementType::Insert,
                 row_to_insert: Some(Row {
                     id: id_result.unwrap(),
-                    username: username.to_string(),
-                    email: email.to_string(),
+                    username: store_username(username_bytes),
+                    email: store_email(email_bytes),
                 }),
             })
         }
@@ -82,4 +85,26 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
         }
         _ => Err(ParsingError::UnrecognizedStatement),
     }
+}
+
+/// Copies the username data from a slice into a fixed size array.
+fn store_username(username: &[u8]) -> [u8; COLUMN_USERNAME_SIZE] {
+    let mut username_bytes = [0u8; COLUMN_USERNAME_SIZE];
+
+    { 0..username.len() }.for_each(|i| {
+        username_bytes[i] = username[i];
+    });
+
+    username_bytes
+}
+
+/// Copies the email data from a slice into a fixed size array.
+fn store_email(email: &[u8]) -> [u8; COLUMN_EMAIL_SIZE] {
+    let mut email_bytes = [0u8; COLUMN_EMAIL_SIZE];
+
+    { 0..email.len() }.for_each(|i| {
+        email_bytes[i] = email[i];
+    });
+
+    email_bytes
 }
