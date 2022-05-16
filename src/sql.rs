@@ -46,35 +46,15 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
                 return Err(ParsingError::InvalidId);
             }
 
-            let username_bytes = username.as_bytes();
-            let email_bytes = email.as_bytes();
-
-            if username_bytes.len() > COLUMN_USERNAME_SIZE {
-                println!(
-                    "username cannot be longer than {} bytes '{}' has a length of {}",
-                    COLUMN_USERNAME_SIZE,
-                    username,
-                    username.len()
-                );
-                return Err(ParsingError::InvalidUsername);
-            }
-
-            if email_bytes.len() > COLUMN_EMAIL_SIZE {
-                println!(
-                    "email cannot be longer than {} bytes '{}' has a length of {}",
-                    COLUMN_EMAIL_SIZE,
-                    email,
-                    email.len()
-                );
-                return Err(ParsingError::InvalidEmail);
-            }
+            let username_result = store_username(username)?;
+            let email_result = store_email(email)?;
 
             Ok(Statement {
                 r#type: StatementType::Insert,
                 row_to_insert: Some(Row {
                     id: id_result.unwrap(),
-                    username: store_username(username_bytes),
-                    email: store_email(email_bytes),
+                    username: username_result,
+                    email: email_result,
                 }),
             })
         }
@@ -87,24 +67,49 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
     }
 }
 
-/// Copies the username data from a slice into a fixed size array.
-fn store_username(username: &[u8]) -> [u8; COLUMN_USERNAME_SIZE] {
-    let mut username_bytes = [0u8; COLUMN_USERNAME_SIZE];
+/// Checks the size of the username data and copies it into a constant length byte array.
+fn store_username(username: &&str) -> Result<[u8; COLUMN_USERNAME_SIZE], ParsingError> {
+    let username_bytes = username.as_bytes();
 
-    { 0..username.len() }.for_each(|i| {
-        username_bytes[i] = username[i];
-    });
+    if username_bytes.len() > COLUMN_USERNAME_SIZE {
+        println!(
+            "username cannot be longer than {} bytes '{}' has a length of {}",
+            COLUMN_USERNAME_SIZE,
+            username,
+            username.len()
+        );
 
-    username_bytes
+        Err(ParsingError::InvalidUsername)
+    } else {
+        let mut username_array = [0u8; COLUMN_USERNAME_SIZE];
+
+        { 0..username.len() }.for_each(|i| {
+            username_array[i] = username_bytes[i];
+        });
+
+        Ok(username_array)
+    }
 }
 
-/// Copies the email data from a slice into a fixed size array.
-fn store_email(email: &[u8]) -> [u8; COLUMN_EMAIL_SIZE] {
-    let mut email_bytes = [0u8; COLUMN_EMAIL_SIZE];
+/// Checks the size of the email data and copies it into a constant length byte array.
+fn store_email(email: &&str) -> Result<[u8; COLUMN_EMAIL_SIZE], ParsingError> {
+    let email_bytes = email.as_bytes();
+    if email_bytes.len() > COLUMN_EMAIL_SIZE {
+        println!(
+            "email cannot be longer than {} bytes '{}' has a length of {}",
+            COLUMN_EMAIL_SIZE,
+            email,
+            email.len()
+        );
 
-    { 0..email.len() }.for_each(|i| {
-        email_bytes[i] = email[i];
-    });
+        Err(ParsingError::InvalidEmail)
+    } else {
+        let mut email_array = [0u8; COLUMN_EMAIL_SIZE];
 
-    email_bytes
+        { 0..email.len() }.for_each(|i| {
+            email_array[i] = email_bytes[i];
+        });
+
+        Ok(email_array)
+    }
 }
