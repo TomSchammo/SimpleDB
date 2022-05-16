@@ -61,7 +61,7 @@ pub fn prepare_statement(command: &str) -> Result<Statement, ParsingError> {
         ["insert", rest @ ..] => {
             println!("invalid insert statement");
             println!("{:?}", rest);
-            return Err(ParsingError::UnrecognizedStatement);
+            Err(ParsingError::UnrecognizedStatement)
         }
         _ => Err(ParsingError::UnrecognizedStatement),
     }
